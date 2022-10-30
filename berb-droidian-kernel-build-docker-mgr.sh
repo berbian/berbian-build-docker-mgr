@@ -2,8 +2,8 @@
 
 ## berb-droidian-kernel-build-docker-mgr
 ## Script that manages a custom docker container with Droidian build environment
-## Version 0.0.2
-## Branch develop
+## Version 0.0.2-1
+## Branch testing
 
 # Copyright (C) 2022 Berbasc
 # All rights reserved.
@@ -35,11 +35,16 @@
 ################
   # v_next
     # Add cmd params support
+
+  # v_0.0.2-1
+    # New: fn_ip_forward_activa
+
   # v_0.0.2
     # Added build-kernel-on-container feature 
       # Before compiling, script asks for remove out dir.
     # Added feature to enable/disable download build deps in kernel-info.mk
     # Improvements in commit_container function.
+
   # v_0.0.1
    # Features:
     # Create container: Create container from docker image:
@@ -78,6 +83,16 @@ IMAGE_COMMIT_TAG='bookworm-amd64'
 #######################
 ## Config functions  ##
 #######################
+fn_ip_forward_activa() {
+	FORWARD_ES_ACTIVAT=$(cat /proc/sys/net/ipv4/ip_forward)
+	if [ "$FORWARD_ES_ACTIVAT" -eq "0" ]; then
+		echo "" && echo "Activant ip4_forward..."
+		sysctl -w net.ipv4.ip_forward=1
+		systemctl restart docker
+	else
+		echo "" && echo "ip4_forward prèviament activat!"
+	fi
+}
 ## Function to get a action
 fn_action_prompt() {
 	echo "" && echo "Action is required:"
@@ -267,6 +282,7 @@ fn_build_kernel_on_container() {
 ## Start script execution ##
 ############################
 ## Configuration
+fn_ip_forward_activa
 fn_action_prompt
 fn_set_global_paths
 	#echo "KERNEL_DIR = $KERNEL_DIR"
