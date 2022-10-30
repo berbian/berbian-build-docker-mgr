@@ -354,14 +354,14 @@ fn_build_kernel_on_container() {
 	[ -d "$PACKAGES_DIR" ] || mkdir $PACKAGES_DIR
 	# Script creation to launch compilation inside the container.
 	echo '#!/bin/bash' > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export PATH=/proton-clang-11/bin:$PATH" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "Aexport R=llvm-ar" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export NM=llvm-nm" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export OBJCOPY=llvm-objcopy" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export OBJDUMP=llvm-objdump" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export STRIP=llvm-strip" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export CC=clang" > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export CROSS_COMPILE=aarch64-linux-gnu-" > $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export PATH=/proton-clang-11/bin:$PATH" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export R=llvm-ar" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export NM=llvm-nm" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export OBJCOPY=llvm-objcopy" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export OBJDUMP=llvm-objdump" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export STRIP=llvm-strip" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export CC=clang" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export CROSS_COMPILE=aarch64-linux-gnu-" >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'chmod +x /buildd/sources/debian/rules' >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'cd /buildd/sources' >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'rm -f debian/control' >> $KERNEL_DIR/compile-droidian-kernel.sh
