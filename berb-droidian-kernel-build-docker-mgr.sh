@@ -162,8 +162,11 @@ fn_configura_build_env() {
 	read -p "Continue..."
 
 	## Depends  ## To do: Get deps from kernel-info.mk
-	APT_INSTALL_DEPS="net-tools vim linux-packaging-snippets linux-initramfs-halium-generic:arm64 binutils-aarch64-linux-gnu \
-	clang-android-6.0-4691093 gcc-4.9-aarch64-linux-android g++-4.9-aarch64-linux-android libgcc-4.9-dev-aarch64-linux-android-cross"
+	APT_INSTALL_DEPS="net-tools vim locate git linux-packaging-snippets linux-initramfs-halium-generic:arm64 binutils-aarch64-linux-gnu \
+	clang-android-6.0-4691093 clang-android-10.0-r370808 android-sdk-ufdt-tests avbtool bc binutils-gcc4.9-aarch64-linux-android bison \
+	cpio device-tree-compiler flex 	kmod libfdt1 libkmod2 libpcre3 libpython2-stdlib libpython2.7-minimal libpython2.7-stdlib libssl-dev \
+	libyaml-0-2 linux-initramfs-halium-generic mkbootimg mkdtboimg python2 python2-minimal python2.7 python2.7-minimal"
+#	gcc-4.9-aarch64-linux-android g++-4.9-aarch64-linux-android libgcc-4.9-dev-aarch64-linux-android-cross
 	## Docker constants
 	DEFAULT_CONTAINER_NAME='droidian-build-env'
 	CONTAINER_NAME="$DEFAULT_CONTAINER_NAME"
