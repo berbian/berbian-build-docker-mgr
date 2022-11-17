@@ -1,16 +1,17 @@
 #!/bin/bash
 
 
-TOOL_NOM='berb-droidian-kernel-build-docker-mgr'
-TOOL_VERSIO='0.0.3'
-TOOL_BRANCA='testing'
+TOOL_NOM='berbian-build-docker-mgr'
+TOOL_VERSIO='0.1.1'
+TOOL_BRANCA='devel'
 
 # Not used yet by this script:
-# VERSIO_SCRIPTS_SHARED_FUNCS="0.2.1"
+# VERSIO_SCRIPTS_SHARED_FUNCS="021"
 
-# Upstream-Name: berb-droidian-kernel-build-docker-mgr
-# Source: https://github.com/berbascum/berb-droidian-kernel-build-docker-mgr
-  ## Script that manages a custom docker container with Droidian build environment
+# Upstream-Name: berbian-build-docker-mgr
+# Source: https://github.com/berbian/berbian-build-docker-mgr
+  ## Script that manages docker containers with different build environments.
+  ## Fork of Berbascum's "berb-droidian-kernel-build-docker-mgr" script, that was Droidian specific. The old one is abandoned at version 0.0.3.
 
 # Copyright (C) 2022 Berbascum <berbascum@ticv.cat>
 # All rights reserved.
@@ -47,7 +48,10 @@ TOOL_BRANCA='testing'
     # Add cmd params support
     # Before compiling, script asks for remove out dir?
 
-  # v_0.0.3: name changed from "droidian-manage-docker-container to "berb-droidian-kernel-build-docker-mgr"
+
+  # v_0.1.1: Renamed from "berb-droidian-kernel-build-docker-mgr" to "berbian-build-docker-mgr"
+  
+  # v_0.0.3: Renamed from "droidian-manage-docker-container to "berb-droidian-kernel-build-docker-mgr"
     # New: fn_configura_sudo
     # New: fn_configura_build_env
     # New: Implemented kernel path auto detection
@@ -163,10 +167,11 @@ fn_configura_build_env() {
 
 	## Depends  ## To do: Get deps from kernel-info.mk
 	APT_INSTALL_DEPS="net-tools vim locate git linux-packaging-snippets linux-initramfs-halium-generic:arm64 binutils-aarch64-linux-gnu \
-	clang-android-6.0-4691093 clang-android-10.0-r370808 android-sdk-ufdt-tests avbtool bc binutils-gcc4.9-aarch64-linux-android bison \
+	clang-android-6.0-4691093 android-sdk-ufdt-tests avbtool bc binutils-gcc4.9-aarch64-linux-android bison \
 	cpio device-tree-compiler flex 	kmod libfdt1 libkmod2 libpcre3 libpython2-stdlib libpython2.7-minimal libpython2.7-stdlib libssl-dev \
-	libyaml-0-2 linux-initramfs-halium-generic mkbootimg mkdtboimg python2 python2-minimal python2.7 python2.7-minimal"
-#	gcc-4.9-aarch64-linux-android g++-4.9-aarch64-linux-android libgcc-4.9-dev-aarch64-linux-android-cross
+	libyaml-0-2 linux-initramfs-halium-generic mkbootimg mkdtboimg python2 python2-minimal python2.7 python2.7-minimal \
+	gcc-4.9-aarch64-linux-android g++-4.9-aarch64-linux-android libgcc-4.9-dev-aarch64-linux-android-cross"
+	# clang-android-10.0-r370808 
 	## Docker constants
 	DEFAULT_CONTAINER_NAME='droidian-build-env'
 	CONTAINER_NAME="$DEFAULT_CONTAINER_NAME"
@@ -357,20 +362,32 @@ fn_build_kernel_on_container() {
 	[ -d "$PACKAGES_DIR" ] || mkdir $PACKAGES_DIR
 	# Script creation to launch compilation inside the container.
 	echo '#!/bin/bash' > $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export PATH=/proton-clang-11/bin:$PATH" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export R=llvm-ar" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export NM=llvm-nm" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export OBJCOPY=llvm-objcopy" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export OBJDUMP=llvm-objdump" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export STRIP=llvm-strip" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export CC=clang" >> $KERNEL_DIR/compile-droidian-kernel.sh
-	echo "export CROSS_COMPILE=aarch64-linux-gnu-" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export PATH=/proton-clang-11/bin:$PATH" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export R=llvm-ar" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export NM=llvm-nm" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export OBJCOPY=llvm-objcopy" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export OBJDUMP=llvm-objdump" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export STRIP=llvm-strip" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export CC=clang" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	#echo "export CROSS_COMPILE=aarch64-linux-gnu-" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	
+	echo "export TOOLCHAINS_PATH='/buildd/sources/toolchains/android-ndk/toolchains'" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export CROSS_32_PATH=\"\$TOOLCHAINS_PATH/arm-linux-androideabi-4.9/prebuilt/linux-x86_64\""  >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export PATH=\"\$CROSS_32_PATH:\$CROSS_32_PATH/bin:\$PATH\""  >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "export CROSS_COMPILE_ARM32='arm-linux-androideabi-'"  >> $KERNEL_DIR/compile-droidian-kernel.sh
+
 	echo 'chmod +x /buildd/sources/debian/rules' >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'cd /buildd/sources' >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'rm -f debian/control' >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'debian/rules debian/control' >> $KERNEL_DIR/compile-droidian-kernel.sh
 	echo 'RELENG_HOST_ARCH="arm64" releng-build-package' >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "if [ \"\$?\" -eq '0' ]; then" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "		echo  && echo "Compilation finished." && echo" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "else" >> $KERNEL_DIR/compile-droidian-kernel.sh 
+	echo "		echo  && echo "Compilation failed." && echo" >> $KERNEL_DIR/compile-droidian-kernel.sh
+	echo "fi" >> $KERNEL_DIR/compile-droidian-kernel.sh
 	chmod u+x $KERNEL_DIR/compile-droidian-kernel.sh
+	vim $KERNEL_DIR/compile-droidian-kernel.sh
 	# ask for disable install build deps in debian/kernel.mk if enabled.
 	#INSTALL_DEPS_IS_ENABLED=$(grep -c "^DEB_TOOLCHAIN")
 	#if [ "$INSTALL_DEPS_IS_ENABLED" -eq "1" ]; then
@@ -383,7 +400,6 @@ fn_build_kernel_on_container() {
 	#fi
 	# Build execution command inide container
 	docker exec -it $CONTAINER_NAME bash /buildd/sources/compile-droidian-kernel.sh
-	echo  && echo "Compilation finished."
 # fn_create_outputs_backup
 }
 
